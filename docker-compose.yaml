@@ -1,0 +1,19 @@
+version: "3.8"
+
+volumes:
+  vol-booking:
+
+services:
+  booking-postgres:
+    image: "postgres:16.3-bullseye"
+    container_name: "booking-postgres"
+    ports:
+      - "4444:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: hotel_booking123
+      POSTGRES_USER: hotel_booking
+      POSTGRES_DB: db_hotel_booking
+    volumes:
+      - "vol-booking:/var/lib/postgresql/data"
+
