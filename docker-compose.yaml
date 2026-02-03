@@ -1,8 +1,3 @@
-version: "3.8"
-
-volumes:
-  vol-booking:
-
 services:
   db:
     image: postgres:16.3-bullseye
@@ -31,8 +26,10 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db_hotel_booking
-      SPRING_DATASOURCE_USERNAME: hotel_booking
-      SPRING_DATASOURCE_PASSWORD: hotel_booking123
+
+volumes:
+  vol-booking:
