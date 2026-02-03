@@ -3,10 +3,13 @@ package com.Rothana.hotel_booking_system.fileupload;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,21 +17,10 @@ import java.util.List;
 public class FileUploadController {
     private final FileUploadService fileUploadService;
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{fileName}")
-    void deleteFileName(@PathVariable String fileName) {
-        fileUploadService.deleteByFileName(fileName);
-    }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/multiple")
-    List<FileUploadResponse> uploadMultiple(@RequestBody List<MultipartFile> files) {
-        return fileUploadService.uploadMultiple(files);
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    FileUploadResponse upload(@RequestBody MultipartFile file) {
-        return fileUploadService.upload(file);
+    public ResponseEntity<Map> uploadImage(@RequestParam("image")MultipartFile file) throws IOException {
+        Map data =   this.fileUploadService.upload(file);
+        return new ResponseEntity<>(data, HttpStatus.OK);
     }
 }

@@ -4,16 +4,35 @@ volumes:
   vol-booking:
 
 services:
-  booking-postgres:
-    image: "postgres:16.3-bullseye"
-    container_name: "booking-postgres"
+  db:
+    image: postgres:16.3-bullseye
+    container_name: booking-postgres
     ports:
       - "4444:5432"
-    restart: always
     environment:
-      POSTGRES_PASSWORD: hotel_booking123
-      POSTGRES_USER: hotel_booking
       POSTGRES_DB: db_hotel_booking
+      POSTGRES_USER: hotel_booking
+      POSTGRES_PASSWORD: hotel_booking123
     volumes:
-      - "vol-booking:/var/lib/postgresql/data"
+      - vol-booking:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel_booking -d db_hotel_booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hotel-booking-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db_hotel_booking
+      SPRING_DATASOURCE_USERNAME: hotel_booking
+      SPRING_DATASOURCE_PASSWORD: hotel_booking123

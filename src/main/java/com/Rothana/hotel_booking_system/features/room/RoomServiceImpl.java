@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -29,36 +30,54 @@ public class RoomServiceImpl implements RoomService {
         RoomType roomType = roomTypeRepository.findById(roomTypeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "RoomType Id Not Found"));
 
-        FileUploadResponse upload = fileUploadService.upload(image);
+        String imageUrl = null;
+        try {
+            if (image != null && !image.isEmpty()) {
+                Map<String, Object> upload = fileUploadService.upload(image);
+                imageUrl = (String) upload.get("secure_url");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Upload image failed", e);
+        }
 
         Room room = new Room();
         room.setRoomType(roomType);
         room.setStatus(status != null ? status : "available");
-        room.setImage(upload.url());
+        room.setImage(imageUrl);
         return roomMapper.toRoomResponse(roomRepository.save(room));
     }
 
     @Override
     public RoomResponse update(Integer id, Integer roomTypeId, String status, MultipartFile image) {
+
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room Id Not Found"));
 
+        // update roomType if provided
         if (roomTypeId != null) {
             RoomType roomType = roomTypeRepository.findById(roomTypeId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "RoomType Id Not Found"));
             room.setRoomType(roomType);
         }
 
-        if (status != null) {
+        // update status if provided
+        if (status != null && !status.isBlank()) {
             room.setStatus(status);
         }
 
+        // update image if provided
         if (image != null && !image.isEmpty()) {
-            FileUploadResponse upload = fileUploadService.upload(image);
-            room.setImage(upload.url());
+            try {
+                Map<String, Object> upload = fileUploadService.upload(image);
+                String imageUrl = (String) upload.get("secure_url");
+                room.setImage(imageUrl);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Upload image failed", e);
+            }
         }
 
-        return roomMapper.toRoomResponse(roomRepository.save(room));
+        Room saved = roomRepository.save(room);
+        return roomMapper.toRoomResponse(saved);
     }
 
     @Override
