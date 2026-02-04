@@ -5,13 +5,13 @@ services:
     ports:
       - "4444:5432"
     environment:
-      POSTGRES_DB: db_hotel_booking
-      POSTGRES_USER: hotel_booking
-      POSTGRES_PASSWORD: hotel_booking123
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - vol-booking:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hotel_booking -d db_hotel_booking"]
+      test: ["CMD-SHELL", "pg_isready -U {POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10

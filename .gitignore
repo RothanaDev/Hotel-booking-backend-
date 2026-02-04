@@ -8,7 +8,8 @@ build/
 # Environment variables
 .env
 .env.*
-application-dev.yml
+src/main/resources/application-local.yaml
+
 ### STS ###
 .apt_generated
 .classpath

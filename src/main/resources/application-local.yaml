@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:4444/db_hotel_booking
+    username: hotel_booking
+    password: hotel_booking123
+    driver-class-name: org.postgresql.Driver
+
+cloudinary:
+  cloud-name: dkloakzs6
+  api-key: 162361396439147
+  api-secret: DVu7SNnY50pVCr7xxY1mRmsO4Os
