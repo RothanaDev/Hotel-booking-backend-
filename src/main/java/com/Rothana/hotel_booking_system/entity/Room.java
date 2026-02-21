@@ -17,8 +17,7 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private  Integer id;
-
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "room_type_id")
@@ -26,6 +25,20 @@ public class Room {
 
     private String status = "available";
     private String image;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomCalendar> roomCalendar;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HousekeepingTask> housekeepingTasks;
+
+    // ===============================
+    // 4) MAINTENANCE TICKET Relationship
+    // ===============================
+
+    // One Room can have many Maintenance tickets
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MaintenanceTicket> maintenanceTickets;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Booking> bookings;

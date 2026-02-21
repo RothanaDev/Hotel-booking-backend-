@@ -26,7 +26,7 @@ public class RoomController {
     ) {
         return roomService.create(roomTypeId, status, image);
     }
-    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RoomResponse update(
             @PathVariable Integer id,
             @RequestParam(value = "roomTypeId", required = false) Integer roomTypeId,
@@ -35,16 +35,16 @@ public class RoomController {
     ) {
         return roomService.update(id, roomTypeId, status, image);
     }
-    @GetMapping("/findById/{id}")
+    @GetMapping("/{id}")
     public   RoomResponse findById(@PathVariable("id") Integer id) {
         return roomService.findById(id);
     }
-    @GetMapping("/findAll")
+    @GetMapping()
     public List<RoomResponse> findAll() {
         return roomService.findAll();
     }
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void  delete(@PathVariable("id") Integer id) {
         roomService.delete(id);
     }

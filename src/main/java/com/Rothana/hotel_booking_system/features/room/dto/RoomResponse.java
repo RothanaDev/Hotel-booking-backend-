@@ -5,10 +5,10 @@ import lombok.Builder;
 
 @Builder
 public record RoomResponse(
-        Integer id,
-        String status,
-        String image,
-        RoomTypeResponse roomType
+                Integer id,
+                String status,
+                String image,
+                RoomTypeResponse roomType
 
 ) {
 }

@@ -13,5 +13,7 @@ public interface BookingService {
     BookingResponse findById(Integer id);
     List<BookingResponse> findAll();
     void delete(Integer id);
+    List<BookingResponse> findBookingsByUserId(Integer userId);
+
 
 }

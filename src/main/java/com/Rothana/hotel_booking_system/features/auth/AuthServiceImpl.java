@@ -81,12 +81,6 @@ public class AuthServiceImpl implements AuthService {
         auth =  jwtAuthenticationProvider.authenticate(auth);
 
 
-        //ROLE_USER ROLE_ADMIN
-//        String scope = auth
-//                .getAuthorities()
-//                .stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.joining(" "));
         Jwt jwt =(Jwt) auth.getPrincipal();
 
         //Generate JWT Token by Encoder
@@ -94,12 +88,11 @@ public class AuthServiceImpl implements AuthService {
         Instant now = Instant.now();
         JwtClaimsSet jwtAccessClaimsSet = JwtClaimsSet.builder()
                 .id(jwt.getId())
-                .subject("Access APIs")
-                .issuer(jwt.getId())
+                .subject(auth.getName())
                 .issuedAt(now)
-                .expiresAt(now.plus(10, ChronoUnit.SECONDS))
+                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
+                .issuer("hotel-booking-system")
                 .audience(jwt.getAudience())
-                .claim("isAdmin",true)
                 .claim("studentId", "RUPP00")
                 .claim("scope",jwt.getClaimAsString("scope"))
                 .build();
@@ -165,30 +158,31 @@ public class AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
+        User user = userRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
 
         //Generate JWT Token by Encoder
         //1 . Define ClaimSets(Payload)
 
         Instant now = Instant.now();
-        JwtClaimsSet jwtClaimsSet =JwtClaimsSet.builder()
+        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .id(auth.getName())
-                .subject("Access APIs")
-                .issuer(auth.getName())
+                .subject(user.getEmail())                // ✅ put email here
+                .issuer("hotel-booking-system")          // ✅ fixed issuer
                 .issuedAt(now)
-                .expiresAt(now.plus(10, ChronoUnit.SECONDS))
+                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
                 .audience(List.of("NextJs","Android","IOS"))
                 .claim("role", scope)
-                .claim("studentId","RUPP")
-                .claim("scope",scope)
+                .claim("scope", scope)
                 .build();
 
 
         //Generate JWT Refresh Token Encoder
         JwtClaimsSet jwtRefreshClaimsSet = JwtClaimsSet.builder()
                 .id(auth.getName())
-                .subject("Refresh Token")
-                .issuer(auth.getName())
+                .subject(user.getEmail())                // ✅ email again
+                .issuer("hotel-booking-system")
                 .issuedAt(now)
                 .claim("role", scope)
                 .expiresAt(now.plus(7, ChronoUnit.DAYS))
@@ -213,6 +207,7 @@ public class AuthServiceImpl implements AuthService {
                 .tokenType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .id(user.getId())
                 .build();
     }
 

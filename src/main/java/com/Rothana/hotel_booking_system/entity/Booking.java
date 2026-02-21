@@ -56,7 +56,8 @@ public class Booking {
     private List<Payment> payments;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingService> bookingServices;
+    private List<BookingService> bookingServices = new java.util.ArrayList<>();
+
 
 
 }

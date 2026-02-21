@@ -9,4 +9,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
     Boolean existsAllByEmail(String email);
+
+    Optional<User> findByTelegramChatId(Long telegramChatId);
+    boolean existsByTelegramChatId(Long telegramChatId);
 }

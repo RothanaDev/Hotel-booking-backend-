@@ -26,6 +26,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.cloudinary:cloudinary-http44:1.38.0'
+    implementation 'org.telegram:telegrambots-spring-boot-starter:6.9.7.1'
+
+    implementation 'com.paypal.sdk:checkout-sdk:1.0.4'
 
     runtimeOnly 'org.postgresql:postgresql'
 
@@ -38,6 +41,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

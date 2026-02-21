@@ -57,6 +57,17 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Booking> bookings;
 
+    @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
+    private List<HousekeepingTask> assignedHousekeepingTasks;
+
+    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
+    private List<MaintenanceTicket> reportedMaintenanceTickets;
+
+    @Column(name = "telegram_chat_id", unique = true)
+    private Long telegramChatId;
+
+
+
 
 
 }

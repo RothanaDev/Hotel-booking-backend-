@@ -10,16 +10,18 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { ServiceBookingMapper.class })
 public interface BookingMapper {
 
     @Mapping(source = "user", target = "userResponse")
     @Mapping(source = "room", target = "roomResponse")
+    @Mapping(source = "bookingServices", target = "bookingServices")
     BookingResponse toBookingResponse(Booking booking);
+
     List<BookingResponse> toBookingResponseList(List<Booking> bookings);
 
     Booking fromBookingCreateRequest(BookingCreateRequest bookingCreateRequest);
-    void  updateBookingFromRequest(BookingUpdateRequest bookingUpdateRequest , @MappingTarget Booking booking);
 
-
+    void updateBookingFromRequest(BookingUpdateRequest bookingUpdateRequest,
+            @MappingTarget Booking booking);
 }

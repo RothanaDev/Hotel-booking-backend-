@@ -12,9 +12,11 @@ import java.util.List;
 public interface RoomMapper {
 
     RoomResponse toRoomResponse(Room room);
-    List<RoomResponse> toRoomResponseList(List<Room> rooms);
-    Room fromRoomCreateRequest(RoomCreateRequest roomCreateRequest);
-    void  updateRoomFromRequest(RoomCreateRequest roomCreateRequest, @MappingTarget Room room);
 
+    List<RoomResponse> toRoomResponseList(List<Room> rooms);
+
+    Room fromRoomCreateRequest(RoomCreateRequest roomCreateRequest);
+
+    void updateRoomFromRequest(RoomCreateRequest roomCreateRequest, @MappingTarget Room room);
 
 }

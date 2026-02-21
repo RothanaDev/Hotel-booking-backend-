@@ -39,4 +39,9 @@ public class BookingController {
     public void delete(@PathVariable("id") Integer id){
         bookingService.delete(id);
     }
+    @GetMapping("/user/{userId}")
+    public List<BookingResponse> getBookingsByUser(@PathVariable Integer userId) {
+        return bookingService.findBookingsByUserId(userId);
+    }
+
 }

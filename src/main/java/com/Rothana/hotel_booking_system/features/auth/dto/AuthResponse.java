@@ -9,6 +9,7 @@ public record AuthResponse(
 
         String accessToken,
 
-        String refreshToken
+        String refreshToken,
+         Integer id
 ) {
 }

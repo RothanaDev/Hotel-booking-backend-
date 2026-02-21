@@ -22,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
+    private final CookieBearerTokenResolver cookieBearerTokenResolver;
 
     @Bean
     JwtAuthenticationProvider configJwtAuthenticationProvider(@Qualifier("refreshTokenJwtDecoder") JwtDecoder refreshTokenJwtDecoder) {
@@ -59,6 +60,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/upload/**").permitAll()
 
+                .requestMatchers("/api/v1/telegram/test/**").permitAll()
+
+                .requestMatchers("/api/v1/payments/paypal/**").permitAll()
+                .requestMatchers("/api/v1/maintenance-tickets/**").permitAll()
+                .requestMatchers("/api/v1/housekeeping-tasks/**").permitAll()
+                .requestMatchers("/api/v1/room-calendar/**").permitAll()
+
                 .requestMatchers(HttpMethod.GET,  "/api/v1/inventory/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/**").hasAnyRole("ADMIN", "STAFF")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/inventory/**").hasAnyRole("ADMIN", "STAFF")
@@ -70,7 +78,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/booking_services/**").hasAnyRole("ADMIN")
 
                 .requestMatchers(HttpMethod.GET,  "/api/v1/booking/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/booking/**").hasAnyRole("ADMIN", "STAFF")
+                .requestMatchers(HttpMethod.POST, "/api/v1/booking/**").permitAll()
+                // ⬇️ ADD THIS LINE so create() is allowed for logged-in users
+                .requestMatchers(HttpMethod.POST, "/api/v1/bookings/**").hasAnyRole("ADMIN", "STAFF", "USER")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/bookings/**").hasAnyRole("ADMIN", "STAFF")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/bookings/**").hasAnyRole("ADMIN")
 
@@ -94,8 +104,15 @@ public class SecurityConfig {
                 .anyRequest().authenticated());
 
         // Security Mechanism (JWT) - only for authenticated endpoints
+//        http.oauth2ResourceServer(oauth2 -> oauth2
+//                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)));
         http.oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)));
+                .bearerTokenResolver(cookieBearerTokenResolver)
+                .jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(jwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                )
+        );
 
         // Disable CSRF Token (Cross Site Request Forgery)
         http.csrf(csrf -> csrf.disable());
