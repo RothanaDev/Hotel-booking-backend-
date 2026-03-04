@@ -1,5 +1,6 @@
 package com.Rothana.hotel_booking_system.features.telegram;
 
+import com.Rothana.hotel_booking_system.entity.TelegramLinkCode;
 import com.Rothana.hotel_booking_system.entity.User;
 import com.Rothana.hotel_booking_system.features.user.UserRepository;
 import org.springframework.stereotype.Component;
@@ -15,14 +16,16 @@ public class HotelBookingTelegramBot extends TelegramLongPollingBot {
 
     private final TelegramBotProperties props;
     private final UserRepository userRepository;
+    private final TelegramLinkCodeRepository linkCodeRepository;
 
     public HotelBookingTelegramBot(
             TelegramBotProperties props,
-            UserRepository userRepository
-    ) {
+            UserRepository userRepository,
+            TelegramLinkCodeRepository linkCodeRepository) {
         super(props.token());
         this.props = props;
         this.userRepository = userRepository;
+        this.linkCodeRepository = linkCodeRepository;
     }
 
     @Override
@@ -32,15 +35,18 @@ public class HotelBookingTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText()) return;
+        if (!update.hasMessage() || !update.getMessage().hasText())
+            return;
 
         Long chatId = update.getMessage().getChatId();
         String text = update.getMessage().getText().trim();
 
-        // Debug (optional)
-        System.out.println("Telegram received: " + text + " chatId=" + chatId);
-
-        if (text.equals("/start")) {
+        if (text.startsWith("/start")) {
+            String[] parts = text.split("\\s+");
+            if (parts.length == 2) {
+                handleLinkByCode(chatId, parts[1]);
+                return;
+            }
             reply(chatId, """
                     Welcome 👋
                     Link your account:
@@ -64,6 +70,11 @@ public class HotelBookingTelegramBot extends TelegramLongPollingBot {
             return;
         }
 
+        if (text.equals("/myid")) {
+            reply(chatId, "Your Chat ID is: `" + chatId + "`");
+            return;
+        }
+
         reply(chatId, "Unknown command. Try /start");
     }
 
@@ -80,6 +91,26 @@ public class HotelBookingTelegramBot extends TelegramLongPollingBot {
         userRepository.save(user);
 
         reply(chatId, "Linked ✅ Hello " + (user.getName() == null ? "" : user.getName()));
+    }
+
+    private void handleLinkByCode(Long chatId, String code) {
+        Optional<TelegramLinkCode> codeOpt = linkCodeRepository.findByCodeAndUsedFalse(code);
+
+        if (codeOpt.isEmpty() || codeOpt.get().getExpiresAt().isBefore(java.time.LocalDateTime.now())) {
+            reply(chatId, "Link code is invalid or expired. ❌\nPlease try /link email@example.com instead.");
+            return;
+        }
+
+        TelegramLinkCode linkCode = codeOpt.get();
+        User user = linkCode.getUser();
+
+        user.setTelegramChatId(chatId);
+        userRepository.save(user);
+
+        linkCode.setUsed(true);
+        linkCodeRepository.save(linkCode);
+
+        reply(chatId, "Linked Automatically! ✅ Hello " + (user.getName() == null ? "" : user.getName()));
     }
 
     private void reply(Long chatId, String msg) {

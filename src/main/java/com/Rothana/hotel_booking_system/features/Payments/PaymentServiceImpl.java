@@ -181,7 +181,7 @@ public class PaymentServiceImpl implements PaymentService {
                 booking.setStatus("paid");
                 bookingRepository.save(booking);
 
-                telegramNotifyService.sendBookingNotification(booking);
+                telegramNotifyService.sendPaymentNotification(booking);
 
             } else if ("PENDING".equalsIgnoreCase(paypalStatus)) {
                 payment.setStatus(PaymentStatus.PENDING);
@@ -208,76 +208,3 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 }
-
-// @Transactional
-// @Override
-// public PaypalCaptureResponse capturePaypalOrder(PaypalCaptureRequest
-// captureRequest) {
-//
-// String orderId = captureRequest.orderId();
-// if (orderId == null || orderId.isBlank()) {
-// throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "orderId is
-// required");
-// }
-//
-// Payment payment = paymentRepository.findByPaypalOrderId(orderId)
-// .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment
-// not found"));
-//
-// // Idempotent
-// if (payment.getStatus() == PaymentStatus.COMPLETED) {
-// return new PaypalCaptureResponse(orderId, payment.getPaypalCaptureId(),
-// "COMPLETED");
-// }
-//
-// OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
-// request.requestBody(new OrderRequest()); // required by SDK
-//
-// try {
-// HttpResponse<Order> response = payPalHttpClient.execute(request);
-// Order order = response.result();
-//
-// String paypalStatus = order.status();
-//
-// String captureId = null;
-// if (order.purchaseUnits() != null && !order.purchaseUnits().isEmpty()) {
-// PurchaseUnit pu = order.purchaseUnits().get(0);
-// if (pu.payments() != null && pu.payments().captures() != null &&
-// !pu.payments().captures().isEmpty()) {
-// captureId = pu.payments().captures().get(0).id();
-// }
-// }
-//
-// if ("COMPLETED".equalsIgnoreCase(paypalStatus)) {
-// payment.setStatus(PaymentStatus.COMPLETED);
-// payment.setPaypalCaptureId(captureId);
-//
-// Booking booking = payment.getBooking();
-// booking.setStatus("paid");
-// bookingRepository.save(booking);
-//
-// } else if ("PENDING".equalsIgnoreCase(paypalStatus)) {
-// payment.setStatus(PaymentStatus.PENDING);
-// } else {
-// payment.setStatus(PaymentStatus.FAILED);
-// }
-//
-// paymentRepository.save(payment);
-//
-// return new PaypalCaptureResponse(orderId, captureId, paypalStatus);
-//
-// } catch (HttpException e) {
-// payment.setStatus(PaymentStatus.FAILED);
-// paymentRepository.save(payment);
-//
-// String msg = "PayPal error (" + e.statusCode() + "): " + e.getMessage();
-// throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, msg);
-//
-// } catch (Exception e) {
-// payment.setStatus(PaymentStatus.FAILED);
-// paymentRepository.save(payment);
-// throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed
-// to capture PayPal order: " + e.getMessage());
-// }
-// }
-// }

@@ -17,7 +17,7 @@ public class ServiceController {
     private  final ServiceService service;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ServiceResponse create(
             @RequestParam("serviceName") String serviceName,
             @RequestParam("description") String description,
@@ -28,7 +28,7 @@ public class ServiceController {
         return service.create(serviceName, description, price, category, image);
     }
 
-    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ServiceResponse  update(
             @PathVariable("id") Integer id,
             @RequestParam("serviceName") String serviceName,
@@ -40,16 +40,16 @@ public class ServiceController {
     ) {
         return  service.update(id, serviceName, description, price, category, image);
     }
-    @GetMapping("/findById/{id}")
+    @GetMapping("/{id}")
     public ServiceResponse findById(@PathVariable("id") Integer id) {
         return service.findById(id);
     }
-    @GetMapping("/findAll")
+    @GetMapping()
     public List<ServiceResponse> findAll() {
         return service.findAll();
     }
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Integer id) {
         service.deleteById(id);
     }

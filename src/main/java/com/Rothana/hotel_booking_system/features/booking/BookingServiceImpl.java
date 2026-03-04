@@ -6,6 +6,7 @@ import com.Rothana.hotel_booking_system.entity.HotelService;
 import com.Rothana.hotel_booking_system.entity.Room;
 import com.Rothana.hotel_booking_system.entity.User;
 import com.Rothana.hotel_booking_system.features.ServiceBooking.ServiceBookingRepository;
+import com.Rothana.hotel_booking_system.features.telegram.TelegramNotifyService;
 import com.Rothana.hotel_booking_system.features.booking.dto.BookingCreateRequest;
 import com.Rothana.hotel_booking_system.features.booking.dto.BookingResponse;
 import com.Rothana.hotel_booking_system.features.booking.dto.BookingUpdateRequest;
@@ -34,6 +35,7 @@ public class BookingServiceImpl implements com.Rothana.hotel_booking_system.feat
 
         private final ServiceRepository serviceRepository;
         private final ServiceBookingRepository serviceBookingRepository;
+        private final TelegramNotifyService telegramNotifyService;
 
         @Transactional
         @Override
@@ -52,8 +54,8 @@ public class BookingServiceImpl implements com.Rothana.hotel_booking_system.feat
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Room Not Found"));
 
-                if(!"available".equalsIgnoreCase(room.getStatus())) {
-                    throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room is not available");
+                if (!"available".equalsIgnoreCase(room.getStatus())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room is not available");
                 }
                 room.setStatus("booked");
                 roomRepository.save(room);
@@ -120,6 +122,9 @@ public class BookingServiceImpl implements com.Rothana.hotel_booking_system.feat
 
                 Booking finalBooking = bookingRepository.save(savedBooking);
 
+                // Notify via Telegram
+                telegramNotifyService.sendNewBookingNotification(finalBooking);
+
                 // 9) Return response
                 return bookingMapper.toBookingResponse(finalBooking);
         }
@@ -183,18 +188,17 @@ public class BookingServiceImpl implements com.Rothana.hotel_booking_system.feat
                 bookingRepository.delete(booking);
         }
 
-    @Override
-    public List<BookingResponse> findBookingsByUserId(Integer userId) {
-        // Validate user exists
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User Not Found"
-                ));
+        @Override
+        public List<BookingResponse> findBookingsByUserId(Integer userId) {
+                // Validate user exists
+                userRepository.findById(userId)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "User Not Found"));
 
-        // Get bookings
-        List<Booking> bookings = bookingRepository.findAllByUserId(userId);
+                // Get bookings
+                List<Booking> bookings = bookingRepository.findAllByUserId(userId);
 
-        // Return response list
-        return bookingMapper.toBookingResponseList(bookings);
-    }
+                // Return response list
+                return bookingMapper.toBookingResponseList(bookings);
+        }
 }

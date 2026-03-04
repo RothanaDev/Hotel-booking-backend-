@@ -19,55 +19,46 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Integer id;
 
-    private String name;
+        private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+        @Column(nullable = false, unique = true)
+        private String email;
 
-    private String phoneNumber;
+        private String phoneNumber;
 
+        @NotBlank(message = "Password is required")
+        private String password;
 
-    @NotBlank(message = "Password is required")
-    private String password;
+    @Column(name = "is_verified")
+    private boolean verified;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+        @Column(name = "created_at")
+        private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+        @Column(name = "updated_at")
+        private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(
-                    name = "user_id",
-                    referencedColumnName = "id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "role_id",
-                    referencedColumnName = "id"
-            )
-    )
-    private List<Role> roles;
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+        private List<Role> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Booking> bookings;
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+        private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
-    private List<HousekeepingTask> assignedHousekeepingTasks;
+        @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
+        private List<HousekeepingTask> assignedHousekeepingTasks;
 
-    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
-    private List<MaintenanceTicket> reportedMaintenanceTickets;
+        @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL)
+        private List<MaintenanceTicket> reportedMaintenanceTickets;
 
-    @Column(name = "telegram_chat_id", unique = true)
-    private Long telegramChatId;
+        @Column(name = "telegram_chat_id")
+        private Long telegramChatId;
 
-
-
-
+      @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+      private List<TelegramLinkCode> telegramLinkCodes;
 
 }

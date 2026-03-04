@@ -38,9 +38,12 @@ app:
     return-url: ${APP_PAYPAL_RETURN_URL:http://localhost:8080/api/v1/payments/paypal/success}
     cancel-url: ${APP_PAYPAL_CANCEL_URL:http://localhost:8080/api/v1/payments/paypal/cancel}
 
-# ✅ Telegram (DEV uses ENV)
+  cookie:
+    secure: true
+    same-site: Lax
+
 telegram:
   bot:
     username: ${TELEGRAM_BOT_USERNAME}
     token: ${TELEGRAM_BOT_TOKEN}
-
+    admin-chat-id: 123456789

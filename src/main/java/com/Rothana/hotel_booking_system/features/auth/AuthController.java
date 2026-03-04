@@ -4,6 +4,7 @@ import com.Rothana.hotel_booking_system.entity.User;
 import com.Rothana.hotel_booking_system.features.auth.dto.*;
 import com.Rothana.hotel_booking_system.features.user.UserRepository;
 import com.Rothana.hotel_booking_system.security.AuthCookieUtil;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -133,4 +134,22 @@ public class AuthController {
     }
 
     public record LoginPublicResponse(Integer id, String tokenType) {}
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/send-verification")
+    void sendVerification(@Valid @RequestBody SendVerificationRequest sendVerificationRequest)throws MessagingException {
+        authService.sendVerification(sendVerificationRequest.email());
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/resend-verification")
+    void resendVerification(@Valid @RequestBody SendVerificationRequest sendVerificationRequest)throws MessagingException {
+        authService.resendVerification(sendVerificationRequest.email());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/verify")
+    void verify(@Valid @RequestBody VerificationRequest verificationRequest) {
+        authService.verify(verificationRequest);
+
+    }
 }

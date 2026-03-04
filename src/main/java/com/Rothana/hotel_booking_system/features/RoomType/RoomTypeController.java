@@ -20,27 +20,27 @@ public class RoomTypeController {
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create")
+    @PostMapping()
     public RoomTypeResponse create(@Valid  @RequestBody RoomTypeCreateRequest  roomTypeCreateRequest ){
         return roomTypeService.create(roomTypeCreateRequest);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public RoomTypeResponse update(@PathVariable("id") Integer id, @Valid  @RequestBody RoomTypeUpdateRequest roomTypeUpdateRequest){
         return roomTypeService.update(id, roomTypeUpdateRequest);
     }
-    @GetMapping("/findById/{id}")
+    @GetMapping("/{id}")
     public RoomTypeResponse findById(@PathVariable("id") Integer id){
         return roomTypeService.findById(id);
     }
-    @GetMapping("/findAll")
+    @GetMapping()
     public List<RoomTypeResponse> findAll(){
         return roomTypeService.findAll();
     }
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void  delete(@PathVariable("id") Integer id){
         roomTypeService.delete(id);
     }
